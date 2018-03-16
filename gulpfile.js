@@ -6,6 +6,11 @@ const sourcemaps = require('gulp-sourcemaps');
 const browserSync = require('browser-sync') ;
 const gutil = require('gulp-util');
 const notify = require("gulp-notify");
+const r = require('tiny-lr')
+const refresh = require('gulp-livereload')
+const nodemon = require('gulp-nodemon')
+// const server = lr();
+const wait = require('gulp-wait');
 
 function showError(err) {
     notify.onError({
@@ -28,7 +33,8 @@ gulp.task('browser-sync', function() {
 });
 
 gulp.task('sass', function () {
-    return gulp.src('./scss/main.scss')
+    return gulp.src('./styles/scss/main.scss')
+        .pipe(wait(500))
         .pipe(plumber({
             errorHandler : showError
         }))
@@ -40,15 +46,15 @@ gulp.task('sass', function () {
             browsers: ["last 2 versions"] //autoprefixy https://github.com/postcss/autoprefixer#browsers
         }))
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('./css'));
+        .pipe(gulp.dest('./styles/css'));
 });
 
 gulp.task('watch', function () {
-    gulp.watch('./scss/**/*.scss', ['sass']);
-    gulp.watch("app/*.html").on('change', browserSync.reload);
+    gulp.watch('./styles/scss/**/*.scss', ['sass']);
+    gulp.watch("./*.html").on('change', browserSync.reload);
 });
 
 gulp.task('default', function() {
     console.log(gutil.colors.yellow('----- rozpoczynam pracę -----'));
-    gulp.start(['sass', 'watch']);
+    gulp.start(['browser-sync', 'sass', 'watch']);
 });
